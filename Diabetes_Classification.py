@@ -151,12 +151,13 @@ for col in df.columns:
 
 def plot_outliers(df):
     for col in df.columns:
-        if df[col].nunique() < 10 and df[col].dtypes != "O":
-            for col in len(df.columns):
-                plt.boxplot(df.columns[col])
+       if col in list_num:
+                sns.boxplot(x=df[col])
                 plt.title("BoxPlot Grafik Gösterimi")
                 plt.show()
 plot_outliers(df)
+
+
 
 
 
