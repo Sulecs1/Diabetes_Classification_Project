@@ -158,11 +158,27 @@ def plot_outliers(df):
 plot_outliers(df)
 
 
-def target_summary_with_num(dataframe, target):#yukarıdaki işlemin genelleştirlmiş hali
-    for numerical_col in df.columns:
+#numerik değişkenlere göre target analizi yaptım
+num_cols = [col for col in df.columns if df[col].nunique() > 10
+            and df[col].dtypes != 'O'
+            and col not in ["Outcome"]]
+
+def target_summary_with_num(dataframe, target, numerical_col):#yukarıdaki işlemin genelleştirlmiş hali
+
      print(dataframe.groupby(target).agg({numerical_col: "mean"}), end="\n\n\n")
 
-target_summary_with_num(df, "Outcome")
+for col in num_cols:
+    target_summary_with_num(df, "Outcome", col)
+
+#değişkenleri regresyon grafiği ile karşılaştırma işlemi yapıldı
+def check_plot(dataframe):
+    for colx in df.columns:
+        for coly in list_num:
+            if colx != coly:
+              sns.lmplot(x=colx, y=coly, data=dataframe)
+              plt.show()
+
+check_plot(df)
 
 
 
