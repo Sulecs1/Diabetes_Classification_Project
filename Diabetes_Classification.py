@@ -32,6 +32,10 @@ import warnings
 from sklearn.metrics import *
 from sklearn.model_selection import *
 
+import pickle
+from helpers.data_prep import *
+from helpers.eda import *
+from helpers.helpers import *
 
 #Eklentiler eklendi
 pd.pandas.set_option('display.max_columns', None)
@@ -45,4 +49,10 @@ def load():
     return data
 
 df = load()
+
+#Aykırı değer varsa görebilmek için
+msno.bar(df)
+plt.show()
+#veri seti gözlemler hakkında inceleme yapıldı
+grab_col_names(df)
 
