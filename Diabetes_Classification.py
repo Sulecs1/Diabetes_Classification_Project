@@ -39,3 +39,10 @@ pd.set_option('display.float_format', lambda x: '%.3f' % x)
 pd.set_option('display.width', 170)
 warnings.filterwarnings('ignore')
 
+#Veri seti için fonskiyon oluşturuldu
+def load():
+    data = pd.read_csv(r"C:\Users\Suleakcay\PycharmProjects\pythonProject6\data\diabetes.csv")
+    return data
+
+df = load()
+
