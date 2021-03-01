@@ -104,6 +104,59 @@ def df_questioning_null(df):
 
 df_questioning_null(df)
 
+#Kategorik ve numerik değişkenleri sorgulamak için fonksiyon oluşturuldu
+def cat_num_col(df):
+    cat_cols = col_names = [col for col in df.columns if df[col].dtypes != "O"]
+    if len(cat_cols) == 0:
+        print("Kategorik değişken bulunmamaktadır!")
+    else:
+        print(f'Kategorik değişkenler : {len(cat_cols)}')
+    num_cols = [col for col in df.columns if df[col].dtypes != "O"]
+    if len(num_cols) == 0:
+        print("Numerik değişken bulunmamaktadır")
+    else:
+        print(f'Numerik değişkenler : {len(num_cols)} ')
+
+cat_num_col(df)
+
+def missing_values_table(df):
+    na_variable = [col for col in df.columns if df[col].isnull().sum() > 0]
+
+    n_miss = df[na_variable].isnull().sum().sort_values(ascending=False)
+
+    ratio = (df[na_variable].isnull().sum() / df.shape[0] * 100).sort_values(ascending=False)
+
+    missing_df = pd.concat([n_miss, np.round(ratio, 2)], axis=1, keys=['n_miss', 'ratio'])
+    if len(missing_df) > 0:
+        print("\nEksik değerleri olan {} sütun var\n".format(len(missing_df)))
+    else:
+        print("Eksik değerler yoktur!")
+
+missing_values_table(df)
+
+#numerik ve kategorik değişken isimleri
+def num_and_cat_name(df):
+    cat_cols = [col for col in df.columns if df[col].nunique() < 10 and df[col].dtypes != "O"]
+    num_cols = [col for col in df.columns if df[col].dtypes != 'O' and col not in ["Outcome"]]
+    return cat_cols, num_cols
+
+num_and_cat_name(df)
+
+list_num = []
+for col in df.columns:
+    if df[col].dtypes != 'O' and col not in ["Outcome"]:
+        list_num.append(col)
+
+
+
+def plot_outliers(df):
+    for col in df.columns:
+        if df[col].nunique() < 10 and df[col].dtypes != "O":
+            for col in len(df.columns):
+                plt.boxplot(df.columns[col])
+                plt.title("BoxPlot Grafik Gösterimi")
+                plt.show()
+plot_outliers(df)
 
 
 
