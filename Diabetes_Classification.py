@@ -49,6 +49,7 @@ def load():
     return data
 
 df = load()
+df.head()
 
 #Aykırı değer varsa görebilmek için
 msno.bar(df)
@@ -134,6 +135,19 @@ def missing_values_table(df):
 
 missing_values_table(df)
 
+def col_nan_assigment(df):
+    for col in df.columns:
+        for row in range(len(df)):
+            if col != "Outcome":
+                if df.loc[row, col] == 0:
+                    if df.loc[row, "Outcome"] == 1:
+                        df.loc[row, col] = df.loc[df["Outcome"] == 1, col].median()
+                    else:
+                        df.loc[row, col] = df.loc[df["Outcome"] == 0, col].median()
+
+col_nan_assigment(df)
+df.head()
+
 #numerik ve kategorik değişken isimleri
 def num_and_cat_name(df):
     cat_cols = [col for col in df.columns if df[col].nunique() < 10 and df[col].dtypes != "O"]
@@ -170,7 +184,7 @@ def target_summary_with_num(dataframe, target, numerical_col):#yukarıdaki işle
 for col in num_cols:
     target_summary_with_num(df, "Outcome", col)
 
-#değişkenleri regresyon grafiği ile karşılaştırma işlemi yapıldı
+#sayısal değişkenleri birbirleri ile karşılaştırma işlemi yapıldı
 def check_plot(dataframe):
     for colx in df.columns:
         for coly in list_num:
@@ -179,6 +193,9 @@ def check_plot(dataframe):
               plt.show()
 
 check_plot(df)
+
+
+
 
 
 
