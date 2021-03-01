@@ -148,7 +148,7 @@ for col in df.columns:
         list_num.append(col)
 
 
-
+#Aykırı değerler boxplot grafiği  gözlendi
 def plot_outliers(df):
     for col in df.columns:
        if col in list_num:
@@ -158,6 +158,11 @@ def plot_outliers(df):
 plot_outliers(df)
 
 
+def target_summary_with_num(dataframe, target):#yukarıdaki işlemin genelleştirlmiş hali
+    for numerical_col in df.columns:
+     print(dataframe.groupby(target).agg({numerical_col: "mean"}), end="\n\n\n")
+
+target_summary_with_num(df, "Outcome")
 
 
 
