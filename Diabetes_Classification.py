@@ -86,9 +86,6 @@ def data_understand(df):
                 yticklabels=corr.columns)
     plt.show()
     print("------------------------------------------------------------------------")
-    print(sns.pairplot(df));
-    plt.show()
-    print("------------------------------------------------------------------------")
     df.hist(bins=20, color="#1c0f45", edgecolor='orange', figsize=(15, 15));
     plt.show()
     print("------------------------------------------------------------------------")
@@ -97,47 +94,18 @@ data_understand(df)
 
 #Veri setindeki eksik değerleri sorgulamak için
 def df_questioning_null(df):
-    """
-    Veri seti içerisindeki eksik değere sahip değişken bilgisini sorgular. Bununla birlikte eksik gözlem olması durumunda sadece eksik gözleme sahip sütun isimlerini getirir.
-    """
+
     print(f"Veri kümesinde hiç boş değer var mı?: {df.isnull().values.any()}")
     if df.isnull().values.any():
         null_values = df.isnull().sum()
         print(f"Hangi sütunlarda eksik değerler var?:\n{null_values[null_values > 0]}")
 
 df_questioning_null(df)
+df.shape
 
-#Kategorik ve numerik değişkenleri sorgulamak için fonksiyon oluşturuldu
-def cat_num_col(df):
-    cat_cols = col_names = [col for col in df.columns if df[col].dtypes != "O"]
-    if len(cat_cols) == 0:
-        print("Kategorik değişken bulunmamaktadır!")
-    else:
-        print(f'Kategorik değişkenler : {len(cat_cols)}')
-    num_cols = [col for col in df.columns if df[col].dtypes != "O"]
-    if len(num_cols) == 0:
-        print("Numerik değişken bulunmamaktadır")
-    else:
-        print(f'Numerik değişkenler : {len(num_cols)} ')
-
-cat_num_col(df)
-
-def missing_values_table(df):
-    na_variable = [col for col in df.columns if df[col].isnull().sum() > 0]
-
-    n_miss = df[na_variable].isnull().sum().sort_values(ascending=False)
-
-    ratio = (df[na_variable].isnull().sum() / df.shape[0] * 100).sort_values(ascending=False)
-
-    missing_df = pd.concat([n_miss, np.round(ratio, 2)], axis=1, keys=['n_miss', 'ratio'])
-    if len(missing_df) > 0:
-        print("\nEksik değerleri olan {} sütun var\n".format(len(missing_df)))
-    else:
-        print("Eksik değerler yoktur!")
-
-missing_values_table(df)
 
 def col_nan_assigment(df):
+    #Nehir Günde Daşçı
     for col in df.columns:
         for row in range(len(df)):
             if col != "Outcome":
@@ -186,16 +154,17 @@ def target_summary_with_num(dataframe, target, numerical_col):#yukarıdaki işle
 for col in num_cols:
     target_summary_with_num(df, "Outcome", col)
 
-#sayısal değişkenleri birbirleri ile karşılaştırma işlemi yapıldı
-def check_plot(dataframe):
-    for colx in df.columns:
-        for coly in list_num:
-            if colx != coly:
-              sns.lmplot(x=colx, y=coly, data=dataframe)
-              plt.show()
+#sayısal değişkenleri birbirleri ile karşılaştırma işlemi grafik incelenerek  yapıldı
+#def check_plot(dataframe):
+#    for colx in df.columns:
+#        for coly in list_num:
+#            if colx != coly:
+#             sns.lmplot(x=colx, y=coly, data=dataframe)
+#             plt.show()
 
-check_plot(df)
+#check_plot(df)
 
+#eşik değerini bulmak için kırılım grafiği incelendi
 clf = LocalOutlierFactor(n_neighbors = 20, contamination = 0.1)
 clf.fit_predict(df)
 df_scores = clf.negative_outlier_factor_
@@ -212,7 +181,7 @@ df[df_scores < esik_deger].index
 #hepsini silmek istersek
 df.drop(axis=0, labels=df[df_scores < esik_deger].index)
 df = df.drop(axis=0, labels=df[df_scores < esik_deger].index)
-
+df.head()
 
 #kişinin akrabalarının diabet olma olasılığını 0-1 arasına çektik
 transformer = MinMaxScaler()
@@ -231,8 +200,8 @@ df = one_hot_encoder(df, ["Insulin_Category"], drop_first=True)
 df = df.drop("Insulin", axis=1)
 df.head()
 
-#yukarıdaki target_summary_with_num,check_comp tekrar incele(182)
 
+#MODEL OLUŞTURMA
 y = df["Outcome"]
 X = df.drop(["Outcome"], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=17)
@@ -281,6 +250,11 @@ def plot_importance(model, features, num=len(X), save=False):
 
 plot_importance(cart_model, X_train)
 
+###############################
+#HİPERPARAMETRE OPTİMİZSAYONU
+###############################
+
+#boş model nesnesi oluşturduk
 cart_model = DecisionTreeClassifier(random_state=17)
 # arama yapılacak hiperparametre setleri
 cart_params = {'max_depth': range(1, 11),
@@ -288,12 +262,14 @@ cart_params = {'max_depth': range(1, 11),
 
 #cross validation ile hiperparemetre araması yapacağız
 #Yani hiperparametre araması yapılırken train seti üzerinde yapılır tüm veri üzerinde yapılmaz!
+#model doğrulama yapılınca asla bütün veri kullanılmaz !!Yanlılık oluşturur!!!
 cart_cv = GridSearchCV(cart_model, cart_params, cv=5, n_jobs=-1, verbose=True)
 cart_cv.fit(X_train, y_train) #train setini çapraz doğrulamaya sokuyor
-#model doğrulama yapılınca asla bütün veri kullanılmaz !!Yanlılık oluşturur!!!
+
 
 
 cart_tuned = DecisionTreeClassifier(**cart_cv.best_params_).fit(X_train, y_train)
+#Model incelemesi
 #** tüm parametreler
 # train hatası
 y_pred = cart_tuned.predict(X_train)
